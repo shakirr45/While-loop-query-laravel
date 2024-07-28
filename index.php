@@ -59,3 +59,32 @@ $allEmployees = Employee::whereHas('attendance', function($query) use ($getToday
 })->with('attendance')->get()->toArray();
 
 just need spacipic this allEmployees ;
+
+
+
+
+
+================================    sub query for eloquent ORM     =================================== 
+
+$getTodayDate = Carbon::now()->format('Y-m-d');
+
+        // $allEmployees = Employee::whereHas('attendance', function($query) use ($getTodayDate) {
+        //     $query->whereDate('created_at', $getTodayDate);
+        // })->with('attendance')->get()->toArray();
+
+
+        $allEmployees = Employee::select('id','name','staff_id')
+        ->with(['employeeDetails' => function($query){
+
+            $query->select('employee_id','photo');
+        }])
+        ->with(['attendance' => function($query) use ($getTodayDate) {  // there is hasMany rleation
+
+            return $query->select('employee_id','status','created_at')
+            ->whereDate('created_at', $getTodayDate)
+            ->first();
+        }])
+        ->get()->toArray();
+
+        
+        dd($allEmployees);
