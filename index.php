@@ -84,7 +84,27 @@ $getTodayDate = Carbon::now()->format('Y-m-d');
             ->whereDate('created_at', $getTodayDate)
             ->first();
         }])
-        ->get()->toArray();
+        ->get()->toArray(); 
+
+        this code give us output for first id
+
+        ========================= correction code =>>
+
+
+        $getTodayDate = Carbon::now()->format('Y-m-d');
+
+        $allEmployees = Employee::select('id','name','staff_id')
+        ->with(['employeeDetails' => function($query){
+
+            $query->select('employee_id','photo');
+        }])
+        ->with(['attendance' => function($query) use ($getTodayDate) {  // there is hasMany rleation
+
+            return $query->select('employee_id','status','created_at')
+            ->whereDate('created_at', $getTodayDate)->limit(1);
+        }])
+        ->get();
+
 
         
         dd($allEmployees);
